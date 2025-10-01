@@ -1,0 +1,53 @@
+import factory.*;
+import manager.ClassroomManager;
+import model.*;
+import observer.SubmissionNotifier;
+
+import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        ClassroomManager manager = ClassroomManager.getInstance();
+        manager.addObserver(new SubmissionNotifier());
+        Scanner sc = new Scanner(System.in);
+        boolean running = true;
+
+        System.out.println("Virtual Classroom Manager");
+
+        while (running) {
+            System.out.print("\nEnter command: ");
+            String input = sc.nextLine();
+            String[] parts = input.split(" ", 2);
+            String command = parts[0];
+
+            try {
+                switch (command) {
+                    case "add_classroom":
+                        manager.addClassroom(ClassroomFactory.createClassroom(parts[1]));
+                        break;
+                    case "add_student":
+                        String[] s = parts[1].split(" ", 2);
+                        manager.addStudent(s[1], StudentFactory.createStudent(s[0]));
+                        break;
+                    case "schedule_assignment":
+                        String[] a = parts[1].split(" ", 2);
+                        manager.scheduleAssignment(a[0], AssignmentFactory.createAssignment(a[1]));
+                        break;
+                    case "submit_assignment":
+                        String[] sub = parts[1].split(" ", 3);
+                        manager.submitAssignment(sub[1], sub[0], sub[2]);
+                        break;
+                    case "exit":
+                        running = false;
+                        break;
+                    default:
+                        System.err.println("Invalid command.");
+                }
+            } catch (Exception e) {
+                System.err.println("Error: " + e.getMessage());
+            }
+        }
+
+        sc.close();
+    }
+}
